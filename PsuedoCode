@@ -1,0 +1,33 @@
+1 #include <stdio.h>
+2 #include <stdlib.h>
+3 #include <unistd.h>
+4 #include <string.h>
+5 #include <sys/wait.h>
+6
+/*This program is an example of a fork program from Chapter 5: Three Easy Pieces by Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau */
+
+7 int
+8 main(int argc, char *argv[])
+9 {
+10 printf("hello world (pid:%d)\n", (int) getpid());
+11 int rc = fork();
+12 if (rc < 0) { // fork failed; exit
+13 fprintf(stderr, "fork failed\n");
+14 exit(1);
+15 } else if (rc == 0) { // child (new process)
+16 printf("hello, I am child (pid:%d)\n", (int) getpid());
+17 char *myargs[3];
+18 myargs[0] = strdup("wc"); // program: "wc" (word count)
+19 myargs[1] = strdup("p3.c"); // argument: file to count
+20 myargs[2] = NULL; // marks end of array
+21 execvp(myargs[0], myargs); // runs word count
+22 printf("this shouldn’t print out");
+23 } else { // parent goes down this path (main)
+24 int wc = wait(NULL);
+25 printf("hello, I am parent of %d (wc:%d) (pid:%d)\n",
+26 rc, wc, (int) getpid());
+27 }
+28 return 0;
+29 }
+
+
